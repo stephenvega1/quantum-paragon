@@ -1,3 +1,6 @@
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/65cd3868572e4dce99c9646a36a30b35)](https://app.codacy.com/gh/stephenvega1/quantum-paragon?utm_source=github.com&utm_medium=referral&utm_content=stephenvega1/quantum-paragon&utm_campaign=Badge_Grade)
+
 Quantum Paragon: Quantum-Inspired Encryption Algorithm
 Quantum Paragon is a quantum-inspired encryption algorithm designed to secure data using a combination of eigenvalues, entropy validation, and dynamic key generation. This algorithm ensures robust security by validating decryption attempts and triggering traps if unauthorized access is detected.
 
