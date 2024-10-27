@@ -134,4 +134,8 @@ Feel free to fork this repository, submit issues and pull requests. Let's enhanc
 
 help useing bing hope you enjoy
 
+The cobol code, is a work on code i used, a program toi translate, python to cobol.
+
+would be a great starting point for research. the updated code, i used the jump, make the enscription more reboost.
+
 stephen vega
