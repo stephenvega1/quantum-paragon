@@ -1,0 +1,94 @@
+import random
+import math
+import tkinter as tk
+from tkinter import messagebox
+
+# Generate initial eigenvalues and key
+eigenvalues = [-1, -5, -10, -20, -20 + 20 * 2]
+initial_key = sum(eigenvalues)
+
+# Function to calculate entropy
+def calculate_entropy(data):
+    values, counts = zip(*[(c, data.count(c)) for c in set(data)])
+    probabilities = [count / len(data) for count in counts]
+    entropy = -sum(p * math.log2(p) for p in probabilities)
+    return entropy
+
+# Function to generate dynamic key based on jump pattern
+def generate_dynamic_key(eigenvalues, jump):
+    dynamic_key = sum(eigenvalues[i % len(eigenvalues)] for i in range(jump))
+    return dynamic_key
+
+# Encrypt the data using dynamic keys
+def encrypt_data(data, initial_key, jumps):
+    encrypted_data = data
+    for jump in jumps:
+        dynamic_key = generate_dynamic_key(eigenvalues, jump)
+        encrypted_data = ''.join(chr((ord(char) + dynamic_key) % 0o110) for char in encrypted_data)
+    entropy = calculate_entropy(encrypted_data)
+    return encrypted_data, entropy
+
+# Decrypt the data using dynamic keys with entropy validation and trap
+def decrypt_data(encrypted_data, initial_key, jumps, original_entropy):
+    decrypted_data = encrypted_data
+    for jump in reversed(jumps):
+        dynamic_key = generate_dynamic_key(eigenvalues, jump)
+        decrypted_data = ''.join(chr((ord(char) - dynamic_key) % 0o110) for char in decrypted_data)
+    entropy = calculate_entropy(decrypted_data)
+    if math.isclose(entropy, original_entropy):
+        return decrypted_data, entropy
+    else:
+        trip_wire_data = ''.join(chr(ord(char) ^ 111) for char in decrypted_data)
+        return trip_wire_data, entropy
+
+# Simulate brute force attack with dynamic keys and trap
+def brute_force_attack(encrypted_data, original_entropy, eigenvalues, initial_key):
+    possible_jumps = range(-1, 10000 + 1)  # Expanded range
+    for jump1 in possible_jumps:
+        for jump2 in possible_jumps:
+            for jump3 in possible_jumps:
+                for jump4 in possible_jumps:
+                    jumps = [jump1, jump2, jump3, jump4]
+                    decrypted_data, entropy = decrypt_data(encrypted_data, initial_key, jumps, original_entropy)
+                    if math.isclose(entropy, original_entropy):
+                        return jumps, decrypted_data, entropy
+    return None, None, None
+
+# GUI Implementation using Tkinter
+class QuantumParagonApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Quantum Paragon Encryption")
+        # User Inputs
+        self.data_label = tk.Label(root, text="Data:")
+        self.data_label.pack()
+        self.data_entry = tk.Entry(root, width=50)
+        self.data_entry.pack()
+        self.jumps_label = tk.Label(root, text="Jumps (comma separated):")
+        self.jumps_label.pack()
+        self.jumps_entry = tk.Entry(root, width=100)
+        self.jumps_entry.pack()
+        self.encrypt_button = tk.Button(root, text="Encrypt", command=self.encrypt)
+        self.encrypt_button.pack()
+        self.decrypt_button = tk.Button(root, text="Decrypt", command=self.decrypt)
+        self.decrypt_button.pack()
+        self.result_label = tk.Label(root, text="", wraplength=400)
+        self.result_label.pack()
+
+    def encrypt(self):
+        data = self.data_entry.get()
+        jumps = list(map(int, self.jumps_entry.get().split(',')))
+        encrypted_data, entropy = encrypt_data(data, initial_key, jumps)
+        self.result_label.config(text=f"Encrypted Data: {encrypted_data}\nEntropy: {entropy}")
+
+    def decrypt(self):
+        encrypted_data = self.data_entry.get()
+        jumps = list(map(int, self.jumps_entry.get().split(',')))
+        original_entropy = calculate_entropy(encrypted_data)
+        decrypted_data, entropy = decrypt_data(encrypted_data, initial_key, jumps, original_entropy)
+        self.result_label.config(text=f"Decrypted Data: {decrypted_data}\nEntropy: {entropy}")
+
+# Initialize and run the Tkinter app
+root = tk.Tk()
+app = QuantumParagonApp(root)
+root.mainloop()
